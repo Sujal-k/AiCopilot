@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 
 import { useRouter } from "next/navigation";
 
-import  {ChatCompletionRequestMessage}  from "openai";
+import { OpenAI } from "openai";
 
 import { useState } from "react";
 import {Empty} from "@/components/empty"

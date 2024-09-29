@@ -34,7 +34,7 @@ export async function POST(req: Request) {
         };
 
         // Send a POST request to the custom API endpoint
-        const response = await fetch("http://4.240.106.246:5000/predictions", {
+        const response = await fetch("http://4.240.106.246:10000/predictions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
         if (!response.ok) {
             const errorResponse = await response.text();
             console.error("[MUSIC_GENERATION_ERROR] Response Error:", errorResponse);
-            return new NextResponse(`Music generation failed: ${errorResponse}`, { status: response.status });
+            return new NextResponse(`Music generation failed: ${errorResponse}, { status: response.status }`);
         }
 
         const responseData = await response.json();
@@ -57,6 +57,6 @@ export async function POST(req: Request) {
         return NextResponse.json(responseData);
     } catch (error: any) {
         console.error("[MUSIC_GENERATION_ERROR]", error.message);
-        return new NextResponse(`Internal Error: ${error.message}`, { status: 500 });
+        return new NextResponse(`Internal Error: ${error.message}, { status: 500 }`);
     }
 }
