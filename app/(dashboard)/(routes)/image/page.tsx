@@ -43,7 +43,7 @@ const ImagePage = () => {
       console.log("API Response:", response.data.output[0]);
 
       if (response.data && Array.isArray(response.data.output)) {
-        const urls = response.data.output.map((base64: string) => ${base64});
+        const urls = response.data.output.map((base64: string) => base64);
         setImages(urls);
       } else {
         console.error("Unexpected response structure:", response.data);
