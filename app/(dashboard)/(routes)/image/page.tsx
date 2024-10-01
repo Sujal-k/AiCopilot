@@ -4,12 +4,15 @@ import * as z from "zod";
 import { Heading } from "@/components/heading";
 import { Download, ImageIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
+
 import { amountOptions, formSchema, resolutionOptions } from "./constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+
 import { useRouter } from "next/navigation";
+
 import { useState } from "react";
 import { Empty } from "@/components/empty";
 import { Loader } from "@/components/loader";
@@ -26,45 +29,31 @@ const ImagePage = () => {
     defaultValues: {
       prompt: "",
       amount: "1",
-      resolution: "512x512",
+      resolution: "512x512"
     },
   });
 
   const isLoading = form.formState.isSubmitting;
 
-  
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      setImages([]);   
- // Clear previous images
+      setImages([]);
       const response = await axios.post("/api/image", values);
 
-      // Check if response.data contains the history log URL
-      if (response.data?.data && response.data.data.length > 0) {
-        const historyLogUrl = response.data.data[0].value; // Extract history log URL
+      console.log("API Response:", response.data.output[0]);
 
-        // Fetch the history log content
-        const logResponse = await fetch(historyLogUrl);
-        const logContent = await logResponse.text();
-
-        // Extract image URLs from the log content (adjust the regex as needed)
-        const imageRegex = /<img src="(.*?)">/g;
-        const imageUrls = logContent.match(imageRegex)?.map((match) => match.replace(/<img src="|">/g, ""));
-
-        if (imageUrls && imageUrls.length > 0) {
-          setImages(imageUrls); // Set images state with the new URLs
-        } else {
-          console.error("No valid image URLs found in history log");
-        }
+      if (response.data && Array.isArray(response.data.output)) {
+        const urls = response.data.output.map((base64: string) => ${base64});
+        setImages(urls);
       } else {
-        console.error("Invalid response structure:", response.data);
+        console.error("Unexpected response structure:", response.data);
       }
 
       form.reset();
     } catch (error: any) {
-      console.log("Error fetching images:", error);
+      console.log(error);
     } finally {
-      router.refresh(); // Optional: refresh the router
+      router.refresh();
     }
   };
 
@@ -90,7 +79,7 @@ const ImagePage = () => {
                   <FormItem className="col-span-12 lg:col-span-6">
                     <FormControl className="m-0 p-0">
                       <Input
-                        className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
+                        className="border-0  outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                         disabled={isLoading}
                         placeholder="Generate an image of the Earth"
                         {...field}
@@ -115,6 +104,7 @@ const ImagePage = () => {
                           <SelectValue defaultValue={field.value} />
                         </SelectTrigger>
                       </FormControl>
+
                       <SelectContent>
                         {amountOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
@@ -126,6 +116,7 @@ const ImagePage = () => {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="resolution"
@@ -142,6 +133,7 @@ const ImagePage = () => {
                           <SelectValue defaultValue={field.value} />
                         </SelectTrigger>
                       </FormControl>
+
                       <SelectContent>
                         {resolutionOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
@@ -153,7 +145,12 @@ const ImagePage = () => {
                   </FormItem>
                 )}
               />
-              <Button disabled={isLoading} className="w-full col-span-12 lg:col-span-2">
+
+
+              <Button
+                disabled={isLoading}
+                className="w-full col-span-12 lg:col-span-2"
+              >
                 Generate
               </Button>
             </form>
@@ -165,7 +162,9 @@ const ImagePage = () => {
               <Loader />
             </div>
           )}
+
           {images.length === 0 && !isLoading && <Empty label="No Images yet" />}
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-8">
             {images.map((src) => (
               <Card key={src} className="rounded-lg overflow-hidden">
@@ -174,13 +173,19 @@ const ImagePage = () => {
                 </div>
                 <CardFooter className="p-2">
                   <Button
-                    onClick={() => { window.open(src) }}
+                    onClick={() => {
+                      const link = document.createElement("a");
+                      link.href = src;
+                      link.download = "generated-image.png"; // You can change the filename if needed
+                      link.click();
+                    }}
                     variant="secondary"
                     className="w-full"
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Download
                   </Button>
+
                 </CardFooter>
               </Card>
             ))}

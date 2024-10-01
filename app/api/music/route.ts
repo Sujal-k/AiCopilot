@@ -34,7 +34,7 @@ export async function POST(req: Request) {
         };
 
         // Send a POST request to the custom API endpoint
-        const response = await fetch("http://4.240.106.246:10000/predictions", {
+        const response = await fetch("http://4.240.106.246:5000/predictions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
