@@ -87,6 +87,6 @@ export async function POST(req: Request) {
         }
     } catch (error: any) {
         console.error("[IMAGE_GENERATION_ERROR] Error:", error.message);
-        return new NextResponse(Internal Error: ${error.message}, { status: 500 });
+        return new NextResponse(`Internal Error: ${error.message}, { status: 500 }`);
     }
 }
